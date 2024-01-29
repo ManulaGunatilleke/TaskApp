@@ -10,7 +10,7 @@ This project uses Maven as its project management tool. Ensure that Java 17 is i
 
 ## Navigate to Project Directory:
 
-`bash cd TaskApp`
+`cd TaskApp`
 
 ## Database Schema and Considerations:
 
