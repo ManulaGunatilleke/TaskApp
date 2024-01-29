@@ -1,11 +1,11 @@
 # TaskApp
 ## Clone the Repository
 
-```bash git clone https://github.com/ManulaGunatilleke/TaskApp.git
+`bash git clone https://github.com/ManulaGunatilleke/TaskApp.git
 
 ## Navigate to Project Directory:
 
-```bash cd TaskApp
+`bash cd TaskApp
 
 ## Note -: Maven used as project management tool
 
