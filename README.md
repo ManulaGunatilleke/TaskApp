@@ -1,4 +1,9 @@
 # TaskApp
+
+## Project Structure
+
+This project uses Maven as its project management tool. Ensure that Java 17 is installed on your system.
+
 ## Clone the Repository
 
 ```git clone https://github.com/ManulaGunatilleke/TaskApp.git```
@@ -6,8 +11,6 @@
 ## Navigate to Project Directory:
 
 `bash cd TaskApp`
-
-## Note -: Maven used as project management tool
 
 ## Database Schema and Considerations:
 
@@ -21,7 +24,8 @@ Once the dependencies are installed and the database is configured:
 
 Choose IDE
 -backend can be run using intelijID
--frontend can be run using VSCode (command -> npm run dev)
+-frontend can be run using VSCode 
+`command -> npm run dev`
 
 The application should be accessible at http://localhost:8080. Adjust the port number if it's configured differently.
 
