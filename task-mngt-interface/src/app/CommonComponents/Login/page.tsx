@@ -68,7 +68,7 @@ const page: React.FC<LoginProps> = () => {
     return (
       <div className="bg-twilight h-screen flex flex-col justify-center items-center">
       <div className="text-white text-4xl mb-8">
-          <h1>OptiVision</h1>
+          <h1>Task Manager</h1>
       </div>
 
       <div className="bg-white p-8 rounded-lg shadow-lg flex flex-col items-center">
