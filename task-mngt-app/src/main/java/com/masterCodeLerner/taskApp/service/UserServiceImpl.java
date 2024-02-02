@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
                         userEntity.getId(),
                         userEntity.getEmailId(),
                         userEntity.getName(),
-                        userEntity.getPassword(),  // Include the password
+                        userEntity.getPassword(),
                         userEntity.getRole()
                 ))
                 .collect(Collectors.toList());
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = userRepository.findById(id).get();
         userEntity.setEmailId(user.getEmailId());
         userEntity.setName(user.getName());
-        userEntity.setPassword(user.getPassword());  // Include the password
+        userEntity.setPassword(user.getPassword());
         userEntity.setRole(user.getRole());
 
         userRepository.save(userEntity);
