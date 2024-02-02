@@ -9,7 +9,7 @@ public interface TaskService {
 
     List<Task> getAllTasks();
 
-    List<Task> getTasksByUserId(Long userId);
+    List<Task> getTasksByUId(Long userId);
 
     Task getTaskById(Long userId, Long taskId);
 

@@ -34,11 +34,11 @@ public class TaskController {
 
     @GetMapping("/user/{userId}")
     public List<Task> getTasksByUserId(@PathVariable Long userId) {
-        return taskService.getTasksByUserId(userId);
+        return taskService.getTasksByUId(userId);
     }
 
     @GetMapping("/{userId}/{taskId}")
-    public ResponseEntity<Task> getTaskById(@PathVariable Long userId, @PathVariable Long taskId) {
+    public ResponseEntity<Task> getTaskByuIdANDtID(@PathVariable Long userId, @PathVariable Long taskId) {
         Task task = taskService.getTaskById(userId, taskId);
         return ResponseEntity.ok(task);
     }

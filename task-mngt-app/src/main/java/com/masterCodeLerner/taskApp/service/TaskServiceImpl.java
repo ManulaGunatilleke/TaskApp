@@ -3,6 +3,7 @@ package com.masterCodeLerner.taskApp.service;
 import com.masterCodeLerner.taskApp.entity.TaskEntity;
 import com.masterCodeLerner.taskApp.entity.UserEntity;
 import com.masterCodeLerner.taskApp.model.Task;
+import com.masterCodeLerner.taskApp.model.User;
 import com.masterCodeLerner.taskApp.repository.TaskRepository;
 import org.springframework.beans.BeanUtils;
 import com.masterCodeLerner.taskApp.repository.UserRepository;
@@ -42,12 +43,11 @@ public class TaskServiceImpl implements TaskService {
             taskRepository.save(taskEntity);
 
             // Set the task id in the task model
-            task.setId(taskEntity.getTId());
+            task.setTId(taskEntity.getTId());
 
             return task;
         } else {
             // Handle case where user does not exist
-            // You might want to throw an exception or handle it based on your requirements
             return null;
         }
     }
@@ -63,14 +63,14 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> getTasksByUserId(Long userId) {
+    public List<Task> getTasksByUId(Long userId) {
         // Check if the user exists
 
         Optional<UserEntity> userEntityOptional = userRepository.findById(userId);
 
         if (userEntityOptional.isPresent()) {
             // User exists, fetch tasks related to the user
-            List<TaskEntity> taskEntities = taskRepository.findByUserId(userId);
+            List<TaskEntity> taskEntities = taskRepository.findByUId_Id(userId);
 
             // Convert TaskEntity list to Task list
             return taskEntities.stream()
@@ -84,34 +84,34 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Task getTaskById(Long userId, Long taskId) {
-        Optional<TaskEntity> taskEntityOptional = taskRepository.findByUserIdAndTId(userId, taskId);
+        Optional<TaskEntity> taskEntityOptional = taskRepository.findByUId_IdAndTId(userId, taskId);
 
         if (taskEntityOptional.isPresent()) {
             // Convert TaskEntity to Task model
             return convertEntityToModel(taskEntityOptional.get());
         } else {
             // Task with the given user id and task id not found
-            return null; // or throw an exception, return a default task, etc., based on your use case
+            return null;
         }
     }
 
     @Override
     public boolean deleteTask(Long userId, Long taskId) {
-        Optional<TaskEntity> taskEntityOptional = taskRepository.findByUserIdAndTId(userId, taskId);
+        Optional<TaskEntity> taskEntityOptional = taskRepository.findByUId_IdAndTId(userId, taskId);
 
         if (taskEntityOptional.isPresent()) {
             // Task with the given user id and task id found, delete it
-            taskRepository.deleteByUserIdAndTId(userId, taskId);
+            taskRepository.deleteByUId_IdAndTId(userId, taskId);
             return true;
         } else {
             // Task with the given user id and task id not found, deletion failed
-            return false; // or throw an exception, handle as needed based on your use case
+            return false;
         }
     }
 
     @Override
     public Task updateTask(Long userId, Long taskId, Task task) {
-        Optional<TaskEntity> taskEntityOptional = taskRepository.findByUserIdAndTId(userId, taskId);
+        Optional<TaskEntity> taskEntityOptional = taskRepository.findByUId_IdAndTId(userId, taskId);
 
         if (taskEntityOptional.isPresent()) {
             // Task with the given user id and task id found, update it
@@ -126,13 +126,21 @@ public class TaskServiceImpl implements TaskService {
             return convertEntityToModel(taskEntity);
         } else {
             // Task with the given user id and task id not found, update failed
-            return null; // or throw an exception, handle as needed based on your use case
+            return null;
         }
     }
 
     private Task convertEntityToModel(TaskEntity taskEntity) {
         Task task = new Task();
         BeanUtils.copyProperties(taskEntity, task);
+
+        // Convert associated user
+        if (taskEntity.getUId() != null) {
+            User user = new User();
+            BeanUtils.copyProperties(taskEntity.getUId(), user);
+            task.setUser(user);
+        }
+
         return task;
     }
 }
