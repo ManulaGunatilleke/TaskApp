@@ -1,27 +1,33 @@
 "use client";
 import { Dialog, Transition } from "@headlessui/react";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useState, useContext, useEffect } from "react";
 
-import TaskList from "../UserTaskList/page";
+import UserTaskList from "../UserTaskList/page";
+import UserContext from "@/app/CommonComponents/ContextComponent/page";
 
 const Page = () => {
   const TASK_API_BASE_URL = "http://localhost:8080/api/v1/tasks";
-
+  const { user } = useContext(UserContext);
+  console.log(user);
+  
   const [isOpen, setIsOpen] = useState(false);
   const [task, setTask] = useState({
-    id: "",
+    tId: undefined,
     taskTitle: "",
     taskDescription: "",
     priority: "",
-    uid: "",
+    uId: user.id,
   });
+  console.log(task);
   const [responseTask, setResponseTask] = useState({
-    id: "",
+    tId: undefined,
     taskTitle: "",
     taskDescription: "",
     priority: "",
-    uid: "",
+    uId: user.id,
   });
+  console.log(responseTask);
+  const [isLoading, setIsLoading] = useState(false);
 
   function closeModal() {
     setIsOpen(false);
@@ -37,32 +43,41 @@ const Page = () => {
   };
 
   const saveTask = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault(); // Since it's a button click, prevent the default behavior if necessary
-    console.log(task);
-    const response = await fetch(TASK_API_BASE_URL + "/" + task.uid + "/" + task.id, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(task),
-    });
+    e.preventDefault();
 
-    if (!response.ok) {
-      throw new Error("Something went wrong");
+    try {
+      setIsLoading(true);
+
+      const response = await fetch(TASK_API_BASE_URL + "/" + task.uId + "/" + task.tId, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(task),
+      });
+
+      if (!response.ok) {
+        throw new Error("Something went wrong");
+      }
+
+      const _task = await response.json();
+      setResponseTask(_task);
+      resetForm();
+    } catch (error) {
+      console.error('Error saving task:', error);
+      // Handle error
+    } finally {
+      setIsLoading(false);
     }
-
-    const _task = await response.json();
-    setResponseTask(_task);
-    resetForm();
   };
 
   const resetForm = () => {
     setTask({
-      id: "",
+      tId: undefined,
       taskTitle: "",
       taskDescription: "",
       priority: "",
-      uid: "",
+      uId: user.id,
     });
     setIsOpen(false);
   };
@@ -73,6 +88,7 @@ const Page = () => {
   };
 
   return (
+    
     <main className="flex flex-col items-center justify-between p-24">
       <div className="container mx-auto my-8">
         <div className="h-12">
@@ -148,25 +164,27 @@ const Page = () => {
                     <div className="h-14 my-4 space-x-4 pt-4">
                       <button
                         onClick={saveTask}
-                        className="rounded text-white font-semibold bg-green-400 hover:bg-green-700 py-2 px-6"
+                        disabled={isLoading}
+                        className={`rounded text-white font-semibold bg-green-400 hover:bg-green-700 py-2 px-6 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
-                        Save
+                        {isLoading ? 'Saving...' : 'Save'}
                       </button>
                       <button
                         onClick={resetButton}
                         className="rounded text-white font-semibold bg-red-400 hover:bg-red-700 py-2 px-6"
                       >
                         Close
-                      </button>
+                      </button>                     
                     </div>
                   </div>
                 </div>
               </div>
-            </Transition.Child>
+            </Transition.Child>            
           </div>
         </Dialog>
       </Transition>
-      <TaskList task={responseTask} />
+      <UserTaskList task={responseTask} />
+      
     </main>
   );
 };

@@ -1,18 +1,10 @@
-import React from 'react'
-
-const page = () => {
-  return (
-    <div>page</div>
-  )
-}
-
-export default page"use client";
+"use client";
 import React, { useState, useEffect, Fragment, ChangeEvent } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 
 
 interface Task {
-  id: string;
+  tId: string;
   taskTitle: string;
   taskDescription: string;
   priority: string;
@@ -20,17 +12,17 @@ interface Task {
 }
 
 interface EditTaskProps {
-  userId: string | null;
-  taskId: string | null;
+  uId: number | null;
+  tId: number | null;
   setResponseTask: React.Dispatch<React.SetStateAction<any>>;
 }
 
-const page: React.FC<EditTaskProps> = ({ userId, taskId, setResponseTask }) => {
+const page: React.FC<EditTaskProps> = ({ uId, tId, setResponseTask }) => {
   const TASK_API_BASE_URL = "http://localhost:8080/api/v1/tasks";
 
   const [isOpen, setIsOpen] = useState(false);
   const [task, setTask] = useState<Task>({
-    id: "",
+    tId: "",
     taskTitle: "",
     taskDescription: "",
     priority: "",
@@ -40,7 +32,7 @@ const page: React.FC<EditTaskProps> = ({ userId, taskId, setResponseTask }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${TASK_API_BASE_URL}/${userId}/${taskId}`, {
+        const response = await fetch(`${TASK_API_BASE_URL}/${uId}/${tId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -54,10 +46,10 @@ const page: React.FC<EditTaskProps> = ({ userId, taskId, setResponseTask }) => {
       }
     };
 
-    if (taskId) {
+    if (tId) {
       fetchData();
     }
-  }, [taskId]);
+  }, [tId]);
 
   function closeModal() {
     setIsOpen(false);
@@ -79,7 +71,7 @@ const page: React.FC<EditTaskProps> = ({ userId, taskId, setResponseTask }) => {
 
   const updateTask = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    const response = await fetch(`${TASK_API_BASE_URL}/${userId}/${taskId}`, {
+    const response = await fetch(`${TASK_API_BASE_URL}/${uId}/${tId}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

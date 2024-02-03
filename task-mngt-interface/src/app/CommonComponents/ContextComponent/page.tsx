@@ -1,10 +1,26 @@
+// UserContext.tsx
 import { createContext } from 'react';
 
-interface UserContextProps {
-  user: any; // Update this to the actual type of your user object
-  setUser: React.Dispatch<React.SetStateAction<any>>; // Update this to the actual type of your setUser function
+interface UserContextType {
+  user: {
+    id: number;
+    emailId: string;
+    name: string;
+    password: string;
+    role: string;
+  };
+  setUser: React.Dispatch<React.SetStateAction<any>>;
 }
 
-const UserContext = createContext<UserContextProps>({ user: {}, setUser: () => {} });
+const UserContext = createContext<UserContextType>({
+  user: {
+    id: 0,
+    emailId: '',
+    name: '',
+    password: '',
+    role: '',
+  },
+  setUser: () => {},
+});
 
 export default UserContext;

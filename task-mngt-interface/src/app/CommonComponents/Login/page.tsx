@@ -16,15 +16,16 @@ const loginLogo = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' fi
 interface LoginProps {}
 
 const page: React.FC<LoginProps> = () => {
-    const { setUser } = useContext(UserContext);
+    const { user, setUser } = useContext(UserContext);
     const [emailId, setEmailId] = useState<string>("");
+   
     const [password, setPassword] = useState<string>("");
     const [role, setRole] = useState<string>("");
     const router = useRouter(); // useRouter hook for programmatic navigation
   
     async function submit(e: React.FormEvent) {
       e.preventDefault();
-  
+    
       try {
         const resultJson = await (
           await fetch("http://localhost:8080/api/v1/login", {
@@ -35,19 +36,23 @@ const page: React.FC<LoginProps> = () => {
             }
           })
         ).json();
-  
+    
+        console.log(resultJson);
+    
+        // Update the user state
         setUser(resultJson);
-  
-        if (resultJson.name) {
+    
+        // Check if resultJson has the necessary properties
+        if (resultJson.name && resultJson.role) {
           localStorage.setItem('newUser', JSON.stringify(resultJson));
-  
+    
           if (resultJson.role === "admin") {
-            console.log(resultJson);
             router.push('/AdminComponents/AddTask');
           } else if (resultJson.role === "user") {
             router.push('/UserComponents/AddUserTask');
           }
         } else {
+          // Notify the user about incorrect details
           toast.warn('Please enter correct details..!', {
             position: "top-center",
             autoClose: 5000,
@@ -58,12 +63,12 @@ const page: React.FC<LoginProps> = () => {
             progress: undefined,
             theme: "light",
           });
-          console.log(e);
         }
       } catch (error) {
         console.error('Error during login:', error);
       }
     }
+    
 
     return (
       <div className="bg-twilight h-screen flex flex-col justify-center items-center">
@@ -94,7 +99,7 @@ const page: React.FC<LoginProps> = () => {
               <div className="mb-4">
                   <label htmlFor="emailId" className="block text-sm font-medium text-gray-700">Email:</label>
                   <input
-                      type="emailId"
+                      type="email"
                       className="form-input w-full mt-1 p-2 border rounded-md"
                       placeholder="Email"
                       onChange={(e) => {

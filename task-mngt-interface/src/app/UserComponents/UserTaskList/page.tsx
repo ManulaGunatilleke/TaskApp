@@ -1,79 +1,91 @@
 "use client";
-import React from "react";
+
+import React, { useContext } from "react";
 
 import { useState, useEffect } from "react";
 import EditTask from "@/app/UserComponents/EditUserTask/page";
 import Task from "@/app/UserComponents/UserTask/page";
-
+import UserContext from "@/app/CommonComponents/ContextComponent/page";
 
 interface Task {
-  id: string;
+  tId?: number;
   taskTitle: string;
   taskDescription: string;
   priority: string;
-  uId: string; 
+  uId: number;
 }
 
 const page: React.FC<{ task: Task }> = ({ task }) => {
-
   const TASK_API_BASE_URL = "http://localhost:8080/api/v1/tasks";
-  
+  const { user } = useContext(UserContext);
   const [tasks, setTasks] = useState<Task[] | null>(null);
   const [loading, setLoading] = useState(true);
-  const [taskId, setTaskId] = useState<string | null>(null);
-  const [uId, setUId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [tId, setTId] = useState<number | null>(null);
+  const [uId, setUId] = useState<number | null>(null);
   const [responseTask, setResponseTask] = useState(null);
 
   useEffect(() => {
+    console.log('Task:', task);
     const fetchData = async () => {
       setLoading(true);
+      setError(null); // Reset error state before each fetch
       try {
-        const response = await fetch(TASK_API_BASE_URL, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const tasks = await response.json();
-        setTasks(tasks);
+        if (user.id) {
+          const response = await fetch(TASK_API_BASE_URL + "/user/" + task.uId, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+  
+          if (!response.ok) {
+            throw new Error("Failed to fetch data");
+          }
+  
+          const tasks = await response.json();
+          setTasks(tasks);
+        }
       } catch (error) {
-        console.log(error);
+        console.error(error);
+        setError("Failed to fetch data. Please try again."); // Set error state
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchData();
   }, [task, responseTask]);
-  
+
   const deleteTask = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    id: string,
-    uId:string
+    uId: number,
+    tId?: number
   ) => {
     e.preventDefault();
-    const response = await fetch(TASK_API_BASE_URL + "/" + uId + "/" + id, {
+    const response = await fetch(TASK_API_BASE_URL + "/" + uId + "/" + tId, {
       method: "DELETE",
     });
-  
+
     if (!response.ok) {
       // Handle the error, show a message, or perform any necessary action
       console.error("Failed to delete task");
       return;
     }
-  
+
     if (tasks) {
       setTasks((prevElement) => {
-        return (prevElement as Task[]).filter((task) => task.id !== id);
+        return (prevElement as Task[]).filter((task) => task.tId !== tId);
       });
     }
   };
-  
+
   const editTask = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    id: string,
-    uId:string
+    uId: number,
+    tId?: number
   ) => {
     e.preventDefault();
-    setTaskId(id);
+    setTId(tId || null);
     setUId(uId);
   };
 
@@ -98,12 +110,12 @@ const page: React.FC<{ task: Task }> = ({ task }) => {
                 </th>
               </tr>
             </thead>
-            {!loading && (
+            {!loading && !error && (
               <tbody className="bg-white">
                 {tasks?.map((task) => (
                   <Task
                     task={task}
-                    key={task.id}
+                    key={task.tId}
                     deleteTask={deleteTask}
                     editTask={editTask}
                   />
@@ -113,7 +125,8 @@ const page: React.FC<{ task: Task }> = ({ task }) => {
           </table>
         </div>
       </div>
-      <EditTask userId = {uId} taskId={taskId} setResponseTask={setResponseTask} />
+      {error && <div>Error: {error}</div>}
+      <EditTask uId={uId} tId={tId} setResponseTask={setResponseTask} />
     </>
   );
 };
