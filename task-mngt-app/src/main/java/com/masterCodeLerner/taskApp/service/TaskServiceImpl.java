@@ -25,6 +25,12 @@ public class TaskServiceImpl implements TaskService {
         this.userRepository = userRepository;
     }
 
+    public class TaskNotFoundException extends RuntimeException {
+        public TaskNotFoundException(String message) {
+            super(message);
+        }
+    }
+
     @Override
     public Task saveTask(Long userId, Task task) {
         TaskEntity taskEntity = new TaskEntity();
@@ -98,14 +104,11 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public boolean deleteTask(Long userId, Long taskId) {
         Optional<TaskEntity> taskEntityOptional = taskRepository.findByUId_IdAndTId(userId, taskId);
-
         if (taskEntityOptional.isPresent()) {
-            // Task with the given user id and task id found, delete it
             taskRepository.deleteByUId_IdAndTId(userId, taskId);
             return true;
         } else {
-            // Task with the given user id and task id not found, deletion failed
-            return false;
+            throw new TaskNotFoundException("Task not found with ID: " + taskId);
         }
     }
 
