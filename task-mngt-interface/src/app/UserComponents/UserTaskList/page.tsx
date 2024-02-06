@@ -8,11 +8,11 @@ import Task from "@/app/UserComponents/UserTask/page";
 import UserContext from "@/app/CommonComponents/ContextComponent/page";
 
 interface Task {
-  tId?: number;
   taskTitle: string;
   taskDescription: string;
   priority: string;
-  uId: number;
+  user: number;
+  tid?: number;
 }
 
 const page: React.FC<{ task: Task }> = ({ task }) => {
@@ -24,69 +24,85 @@ const page: React.FC<{ task: Task }> = ({ task }) => {
   const [tId, setTId] = useState<number | null>(null);
   const [uId, setUId] = useState<number | null>(null);
   const [responseTask, setResponseTask] = useState(null);
+  
 
   useEffect(() => {
-    console.log('Task:', task);
+    console.log('Task_TaskList:', task);
+    console.log('User_TaskList:',user);
     const fetchData = async () => {
+      console.log('Fetching data...');
       setLoading(true);
-      setError(null); // Reset error state before each fetch
+      setError(null);
+    
       try {
-        if (user.id) {
-          const response = await fetch(TASK_API_BASE_URL + "/user/" + task.uId, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
-  
-          if (!response.ok) {
-            throw new Error("Failed to fetch data");
-          }
-  
-          const tasks = await response.json();
-          setTasks(tasks);
+        const userId = user.id;
+        console.log("UserTaskList : ", userId);
+        if (!userId) {
+          throw new Error("User ID is missing.");
         }
+    
+        const response = await fetch(TASK_API_BASE_URL + "/user/" + userId, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+    
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    
+        const tasks = await response.json();
+        setTasks(tasks);
+        console.log('Tasks_TaskList:', tasks);
+        console.log('User2_TaskList:', user);
       } catch (error) {
-        console.error(error);
-        setError("Failed to fetch data. Please try again."); // Set error state
+        console.error("Fetch error:", error);
+        setError("Failed to fetch data. Please try again.");
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
+    if (user && user.id) {
+      fetchData();
+    }
   }, [task, responseTask]);
 
   const deleteTask = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    uId: number,
-    tId?: number
+    user: number,
+    tid?: number
   ) => {
     e.preventDefault();
-    const response = await fetch(TASK_API_BASE_URL + "/" + uId + "/" + tId, {
+    const userId = user
+    const taskId = tid
+    const response = await fetch(TASK_API_BASE_URL + "/" + userId + "/" + taskId, {
       method: "DELETE",
     });
 
     if (!response.ok) {
-      // Handle the error, show a message, or perform any necessary action
+      
       console.error("Failed to delete task");
       return;
     }
 
     if (tasks) {
       setTasks((prevElement) => {
-        return (prevElement as Task[]).filter((task) => task.tId !== tId);
+        return (prevElement as Task[]).filter((task) => task.tid !== tId);
       });
     }
   };
 
   const editTask = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-    uId: number,
-    tId?: number
+    user: number,
+    tid?: number
   ) => {
     e.preventDefault();
-    setTId(tId || null);
-    setUId(uId);
+    // const userId = user
+    // const taskId = tid
+    setTId(tid || null);
+    setUId(user);
   };
 
   return (
@@ -105,6 +121,12 @@ const page: React.FC<{ task: Task }> = ({ task }) => {
                 <th className="text-left font-medium text-gray-500 uppercase tracking-wide py-3 px-6">
                   Priority
                 </th>
+                {/* <th className="text-left font-medium text-gray-500 uppercase tracking-wide py-3 px-6">
+                  uId
+                </th>
+                <th className="text-left font-medium text-gray-500 uppercase tracking-wide py-3 px-6">
+                  tId
+                </th> */}
                 <th className="text-right font-medium text-gray-500 uppercase tracking-wide py-3 px-6">
                   Actions
                 </th>
@@ -115,7 +137,7 @@ const page: React.FC<{ task: Task }> = ({ task }) => {
                 {tasks?.map((task) => (
                   <Task
                     task={task}
-                    key={task.tId}
+                    key={task.tid}
                     deleteTask={deleteTask}
                     editTask={editTask}
                   />
@@ -126,7 +148,7 @@ const page: React.FC<{ task: Task }> = ({ task }) => {
         </div>
       </div>
       {error && <div>Error: {error}</div>}
-      <EditTask uId={uId} tId={tId} setResponseTask={setResponseTask} />
+      <EditTask user={uId} tid={tId} setResponseTask={setResponseTask} />
     </>
   );
 };

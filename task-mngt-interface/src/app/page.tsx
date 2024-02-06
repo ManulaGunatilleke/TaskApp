@@ -1,22 +1,21 @@
-"use client";
-// Import necessary components and libraries
-import { useState, useEffect } from 'react';
+'use client';
+import React, { useState, useEffect } from 'react';
 import Navbar from "@/app/CommonComponents/Navbar/page";
 import Login from "@/app/CommonComponents/Login/page";
 import UserContext from "./CommonComponents/ContextComponent/page";
 import UserTaskList from "@/app/UserComponents/UserTaskList/page";
 import AddUserTask from "@/app/UserComponents/AddUserTask/page";
+import AddTask from "@/app/AdminComponents/AddTask/page";
 
 export default function HomePage() {
-
   const [responseTask, setResponseTask] = useState({
-    tId: undefined,
     taskTitle: "",
     taskDescription: "",
     priority: "",
-    uId: 0,
+    user: 0,
+    tid: 0
   });
-  // Define initial user state
+
   const initialUser = {
     id: 0,
     emailId: '',
@@ -25,34 +24,42 @@ export default function HomePage() {
     role: '',
   };
 
-  // Set up state for user and setUser function
   const [user, setUser] = useState(initialUser);
 
-  // useEffect to monitor changes in user
-  useEffect(() => {
-    // Log whenever user state changes
-    console.log('User context updated:', user);
-  }, [user]);
+  
+
+  // Conditionally render components based on user login status
+  const renderComponents = () => {
+    if (user.id) {
+      // User is logged in
+      if (user.role === 'admin') {
+        // Render components for admin
+        return (
+          <>
+             <AddTask />
+          </>
+        );
+      } else if (user.role === 'user') {
+        // Render components for regular user
+        return (
+          <>
+            <AddUserTask />
+          </>
+        );
+      }
+    } else {
+      // User is not logged in, render login component
+      return <Login />;
+    }
+  };
+  
 
   return (
-    // Wrap the components in UserContext.Provider
     <UserContext.Provider value={{ user, setUser }}>
       <div>
-        {/* Include Navbar component */}
         <Navbar />
-
-        {/* Main content area */}
-        <main className="flex flex-col items-center justify-between p-24">
-          {/* Include Login component */}
-          <Login />
-
-          {/* Include AddUserTask component */}
-          <AddUserTask />
-
-          {/* Include UserTaskList component */}
-          <UserTaskList task={responseTask} />
-
-          
+        <main className="flex flex-col items-center justify-between ">
+          {renderComponents()}
         </main>
       </div>
     </UserContext.Provider>

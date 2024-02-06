@@ -8,25 +8,26 @@ import UserContext from "@/app/CommonComponents/ContextComponent/page";
 const Page = () => {
   const TASK_API_BASE_URL = "http://localhost:8080/api/v1/tasks";
   const { user } = useContext(UserContext);
-  console.log(user);
+  console.log("AddUserTask_User :", user );
   
   const [isOpen, setIsOpen] = useState(false);
   const [task, setTask] = useState({
-    tId: undefined,
     taskTitle: "",
     taskDescription: "",
     priority: "",
-    uId: user.id,
+    user:0,
+    tid: 0
   });
-  console.log(task);
+  console.log('Task_Add:',task);
   const [responseTask, setResponseTask] = useState({
-    tId: undefined,
     taskTitle: "",
     taskDescription: "",
     priority: "",
-    uId: user.id,
+    user:0,
+    tid: 0
   });
-  console.log(responseTask);
+
+  console.log('responseTask_Add:',responseTask);
   const [isLoading, setIsLoading] = useState(false);
 
   function closeModal() {
@@ -48,12 +49,16 @@ const Page = () => {
     try {
       setIsLoading(true);
 
-      const response = await fetch(TASK_API_BASE_URL + "/" + task.uId + "/" + task.tId, {
+      const response = await fetch(TASK_API_BASE_URL + "/" + user.id, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(task),
+        body: JSON.stringify({
+          taskTitle: task.taskTitle,
+          taskDescription: task.taskDescription,
+          priority: task.priority,
+        }),
       });
 
       if (!response.ok) {
@@ -62,6 +67,7 @@ const Page = () => {
 
       const _task = await response.json();
       setResponseTask(_task);
+      console.log('_task_Add:',task);
       resetForm();
     } catch (error) {
       console.error('Error saving task:', error);
@@ -73,11 +79,11 @@ const Page = () => {
 
   const resetForm = () => {
     setTask({
-      tId: undefined,
       taskTitle: "",
       taskDescription: "",
       priority: "",
-      uId: user.id,
+      user:0,
+      tid: 0
     });
     setIsOpen(false);
   };

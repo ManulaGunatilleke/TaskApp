@@ -4,35 +4,38 @@ import { Dialog, Transition } from "@headlessui/react";
 
 
 interface Task {
-  tId: string;
-  taskTitle: string;
-  taskDescription: string;
+  taskTitle: string,
+  taskDescription: string,
   priority: string;
-  uId: string;
+  
 }
 
 interface EditTaskProps {
-  uId: number | null;
-  tId: number | null;
+  user: number | null;
+  tid: number | null;
   setResponseTask: React.Dispatch<React.SetStateAction<any>>;
 }
 
-const page: React.FC<EditTaskProps> = ({ uId, tId, setResponseTask }) => {
+const page: React.FC<EditTaskProps> = ({ user, tid, setResponseTask }) => {
   const TASK_API_BASE_URL = "http://localhost:8080/api/v1/tasks";
+
+  const userId = user; 
+  const taskId = tid;
+  const Respnse = setResponseTask;
+
+  console.log('Edit_Data',userId, taskId, Respnse );
 
   const [isOpen, setIsOpen] = useState(false);
   const [task, setTask] = useState<Task>({
-    tId: "",
     taskTitle: "",
     taskDescription: "",
-    priority: "",
-    uId:""
+    priority: ""
   });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${TASK_API_BASE_URL}/${uId}/${tId}`, {
+        const response = await fetch(`${TASK_API_BASE_URL}/${user}/${tid}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -46,10 +49,10 @@ const page: React.FC<EditTaskProps> = ({ uId, tId, setResponseTask }) => {
       }
     };
 
-    if (tId) {
+    if (tid) {
       fetchData();
     }
-  }, [tId]);
+  }, [tid]);
 
   function closeModal() {
     setIsOpen(false);
@@ -71,12 +74,16 @@ const page: React.FC<EditTaskProps> = ({ uId, tId, setResponseTask }) => {
 
   const updateTask = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    const response = await fetch(`${TASK_API_BASE_URL}/${uId}/${tId}`, {
+    const response = await fetch(`${TASK_API_BASE_URL}/${user}/${tid}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(task),
+      body: JSON.stringify({
+        taskTitle: task.taskTitle,
+        taskDescription: task.taskDescription,
+        priority: task.priority,
+      }),
     });
 
     if (!response.ok) {
@@ -135,7 +142,7 @@ const page: React.FC<EditTaskProps> = ({ uId, tId, setResponseTask }) => {
                   </div>
                   <div className="h-14 my-4">
                     <label className="block text-gray-600 text-sm font-normal">
-                      Email Id
+                      Priority
                     </label>
                     <input
                       type="text"

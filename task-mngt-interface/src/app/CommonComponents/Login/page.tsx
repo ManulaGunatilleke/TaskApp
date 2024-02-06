@@ -1,6 +1,5 @@
 'use client';
 
- // this works in pages directory as well
  import { useRouter } from 'next/navigation';
 import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -37,7 +36,7 @@ const page: React.FC<LoginProps> = () => {
           })
         ).json();
     
-        console.log(resultJson);
+        console.log('resultJson_Login',resultJson);
     
         // Update the user state
         setUser(resultJson);
@@ -45,11 +44,11 @@ const page: React.FC<LoginProps> = () => {
         // Check if resultJson has the necessary properties
         if (resultJson.name && resultJson.role) {
           localStorage.setItem('newUser', JSON.stringify(resultJson));
-    
+          console.log('User_Login',user);
           if (resultJson.role === "admin") {
-            router.push('/AdminComponents/AddTask');
+            router.push('/');
           } else if (resultJson.role === "user") {
-            router.push('/UserComponents/AddUserTask');
+            router.push('/');
           }
         } else {
           // Notify the user about incorrect details

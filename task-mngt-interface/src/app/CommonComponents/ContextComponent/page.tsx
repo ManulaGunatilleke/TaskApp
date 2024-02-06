@@ -23,4 +23,5 @@ const UserContext = createContext<UserContextType>({
   setUser: () => {},
 });
 
+
 export default UserContext;
